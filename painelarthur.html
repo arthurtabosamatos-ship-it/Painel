@@ -1,0 +1,1056 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Painel de Produtividade — Arthur Tabosa Matos</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css">
+<style>
+:root {
+  --bg: #f4f5f7;
+  --bg-card: #ffffff;
+  --bg-surface: #f1f3f5;
+  --bg-hover: #e9ecef;
+  --text: #1c1c1e;
+  --text-muted: #6c757d;
+  --text-hint: #adb5bd;
+  --border: rgba(0,0,0,0.09);
+  --border-strong: rgba(0,0,0,0.15);
+  --blue: #228be6;
+  --blue-bg: #e7f5ff;
+  --blue-text: #1971c2;
+  --green: #2f9e44;
+  --green-bg: #ebfbee;
+  --green-text: #2b8a3e;
+  --amber: #e67700;
+  --amber-bg: #fff9db;
+  --amber-text: #b45309;
+  --red: #c92a2a;
+  --red-bg: #fff5f5;
+  --red-text: #c92a2a;
+  --gray: #868e96;
+  --radius: 8px;
+  --radius-lg: 12px;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #141517;
+    --bg-card: #1e1f24;
+    --bg-surface: #26272c;
+    --bg-hover: #2e2f34;
+    --text: #e9ecef;
+    --text-muted: #909296;
+    --text-hint: #5c5f66;
+    --border: rgba(255,255,255,0.08);
+    --border-strong: rgba(255,255,255,0.14);
+    --blue-bg: #162c42;
+    --blue-text: #74c0fc;
+    --green-bg: #152319;
+    --green-text: #8ce99a;
+    --amber-bg: #2e2000;
+    --amber-text: #fcc419;
+    --red-bg: #2a1010;
+    --red-text: #ff8787;
+  }
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  font-size: 14px;
+  line-height: 1.5;
+  min-height: 100vh;
+}
+
+/* ── LOGIN SCREEN ─────────────────────────────────── */
+#login-screen {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg);
+}
+.login-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 48px 40px;
+  text-align: center;
+  max-width: 380px;
+  width: 100%;
+}
+.login-card h1 { font-size: 20px; font-weight: 600; margin-bottom: 6px; }
+.login-card p  { font-size: 13px; color: var(--text-muted); margin-bottom: 28px; line-height: 1.6; }
+.btn-google {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  padding: 11px 16px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius);
+  background: var(--bg-card);
+  color: var(--text);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.1s;
+}
+.btn-google:hover { background: var(--bg-hover); }
+.btn-google svg { flex-shrink: 0; }
+.login-note { font-size: 11px; color: var(--text-hint); margin-top: 16px; }
+
+/* ── LOADING INDICATOR ────────────────────────────── */
+#loading-screen {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 12px;
+  color: var(--text-muted);
+  font-size: 13px;
+}
+.spinner {
+  width: 24px; height: 24px;
+  border: 2px solid var(--border);
+  border-top-color: var(--blue);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── MAIN APP ─────────────────────────────────────── */
+.page { max-width: 1360px; margin: 0 auto; padding: 16px; }
+
+.header {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 18px 24px;
+  margin-bottom: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.header-left h1 { font-size: 19px; font-weight: 600; }
+.header-left .date { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+.header-right { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.header-stats { display: flex; gap: 8px; flex-wrap: wrap; }
+.stat-badge {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 4px 12px;
+  font-size: 12px;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.stat-badge .n { color: var(--text); font-weight: 700; font-size: 13px; }
+.user-info { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text-muted); }
+.user-avatar {
+  width: 28px; height: 28px; border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid var(--border);
+}
+.user-avatar-fallback {
+  width: 28px; height: 28px; border-radius: 50%;
+  background: var(--blue-bg);
+  color: var(--blue-text);
+  font-size: 11px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--border);
+}
+
+/* ── GRID ─────────────────────────────────────────── */
+.top-grid {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+@media (max-width: 900px) { .top-grid { grid-template-columns: 1fr; } }
+
+/* ── SECTION ──────────────────────────────────────── */
+.section {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 14px 18px;
+}
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+.section-title {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* ── BUTTONS ──────────────────────────────────────── */
+.btn {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 6px 12px; border-radius: var(--radius);
+  font-size: 12px; font-weight: 500; cursor: pointer;
+  border: 1px solid var(--border); background: var(--bg-surface);
+  color: var(--text); font-family: inherit; transition: background 0.1s;
+}
+.btn:hover { background: var(--bg-hover); }
+.btn-primary { background: var(--blue); border-color: var(--blue); color: #fff; }
+.btn-primary:hover { opacity: .88; background: var(--blue); }
+.btn-danger  { background: var(--red-bg); border-color: transparent; color: var(--red-text); }
+.btn-icon { padding: 5px 7px; background: none; border: none; cursor: pointer; color: var(--text-muted); border-radius: var(--radius); display: inline-flex; align-items: center; font-size: 15px; }
+.btn-icon:hover { background: var(--bg-hover); color: var(--text); }
+
+/* ── CALENDAR ─────────────────────────────────────── */
+.cal-events { display: flex; gap: 8px; flex-wrap: wrap; }
+.event-card {
+  background: var(--bg-surface); border: 1px solid var(--border);
+  border-left: 3px solid var(--blue); border-radius: var(--radius);
+  padding: 8px 12px; min-width: 150px; flex: 1 1 150px;
+}
+.event-time { font-size: 11px; color: var(--blue-text); font-weight: 600; }
+.event-name { font-size: 13px; font-weight: 500; margin-top: 2px; line-height: 1.3; }
+.empty-hint { color: var(--text-hint); font-size: 13px; display: flex; align-items: center; gap: 6px; padding: 4px 0; }
+
+/* ── TABS ─────────────────────────────────────────── */
+.tabs-wrap { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; margin-bottom: 10px; }
+.tabs-nav { display: flex; overflow-x: auto; background: var(--bg-surface); border-bottom: 1px solid var(--border); scrollbar-width: thin; scrollbar-color: var(--border) transparent; }
+.tab-btn { padding: 10px 15px; font-size: 13px; font-weight: 500; cursor: pointer; border: none; background: none; color: var(--text-muted); white-space: nowrap; border-bottom: 2px solid transparent; display: flex; align-items: center; gap: 6px; font-family: inherit; transition: color 0.1s; }
+.tab-btn:hover { color: var(--text); background: rgba(0,0,0,.03); }
+.tab-btn.active { color: var(--blue); border-bottom-color: var(--blue); background: var(--bg-card); }
+.tab-sub { font-size: 11px; opacity: .6; }
+.tab-n { font-size: 11px; font-weight: 700; padding: 1px 6px; border-radius: 10px; background: var(--bg-hover); color: var(--text-muted); }
+.tab-btn.active .tab-n { background: var(--blue-bg); color: var(--blue-text); }
+
+/* ── KANBAN ───────────────────────────────────────── */
+.board { display: none; padding: 14px; }
+.board.active { display: block; }
+.board-actions { display: flex; justify-content: flex-end; padding: 0 14px 10px; }
+.kanban { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+@media (max-width: 960px) { .kanban { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 560px) { .kanban { grid-template-columns: 1fr; } }
+.col { background: var(--bg-surface); border: 1px solid var(--border); border-radius: var(--radius-lg); display: flex; flex-direction: column; min-height: 180px; }
+.col-head { padding: 9px 13px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; }
+.col-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; display: flex; align-items: center; gap: 5px; }
+.col-label.pendente  { color: var(--gray); }
+.col-label.andamento { color: var(--blue-text); }
+.col-label.concluida { color: var(--green-text); }
+.col-label.bloqueada { color: var(--red-text); }
+.col-n { font-size: 11px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; padding: 1px 6px; color: var(--text-muted); }
+.col-body { padding: 8px; flex: 1; }
+
+/* ── TASK CARD ────────────────────────────────────── */
+.task { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: 10px 12px; margin-bottom: 7px; }
+.task:hover { border-color: var(--border-strong); }
+.task.atrasada { border-left: 3px solid var(--red); }
+.task.hoje { border-left: 3px solid var(--amber); }
+.task-title { font-size: 13px; font-weight: 500; line-height: 1.35; }
+.task-body { font-size: 12px; color: var(--text-muted); margin-top: 3px; line-height: 1.4; }
+.task-meta { display: flex; gap: 5px; flex-wrap: wrap; align-items: center; margin-top: 7px; }
+.badge { font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 10px; letter-spacing: .02em; }
+.b-alta     { background: var(--red-bg);   color: var(--red-text); }
+.b-media    { background: var(--amber-bg); color: var(--amber-text); }
+.b-baixa    { background: var(--green-bg); color: var(--green-text); }
+.b-atrasada { background: var(--red-bg);   color: var(--red-text); }
+.b-hoje     { background: var(--amber-bg); color: var(--amber-text); }
+.task-date { font-size: 11px; color: var(--text-muted); display: flex; align-items: center; gap: 3px; }
+.task-sub  { font-size: 11px; color: var(--text-hint); }
+.task-acts { display: flex; gap: 4px; margin-top: 8px; justify-content: flex-end; align-items: center; }
+.act { padding: 3px 8px; font-size: 11px; border: 1px solid var(--border); border-radius: 6px; cursor: pointer; background: var(--bg-surface); color: var(--text-muted); display: inline-flex; align-items: center; gap: 3px; font-family: inherit; }
+.act:hover { background: var(--bg-hover); color: var(--text); }
+.act.iniciar  { background: var(--blue-bg);  color: var(--blue-text);  border-color: transparent; }
+.act.concluir { background: var(--green-bg); color: var(--green-text); border-color: transparent; }
+.act.reabrir  { background: var(--bg-surface); color: var(--gray); }
+.act.del:hover { color: var(--red-text); background: var(--red-bg); }
+.add-btn { width: 100%; padding: 7px; background: none; border: 1px dashed var(--border); border-radius: var(--radius); color: var(--text-hint); cursor: pointer; font-size: 12px; display: flex; align-items: center; justify-content: center; gap: 4px; margin-top: 4px; font-family: inherit; }
+.add-btn:hover { background: var(--bg-card); color: var(--text-muted); border-style: solid; }
+
+/* ── SHOPPING ─────────────────────────────────────── */
+.shop-board { padding: 18px; }
+.shop-input { display: flex; gap: 6px; margin-bottom: 12px; }
+.shop-input input[type="text"] { flex: 1; }
+.shop-qty { width: 60px !important; flex-shrink: 0; }
+.shop-cats { display: flex; gap: 8px; margin-bottom: 14px; flex-wrap: wrap; align-items: center; }
+.cat-filter { padding: 5px 12px; border-radius: 20px; border: 1px solid var(--border); background: var(--bg-surface); color: var(--text-muted); font-size: 12px; cursor: pointer; font-family: inherit; }
+.cat-filter.active { background: var(--blue-bg); color: var(--blue-text); border-color: transparent; font-weight: 600; }
+ul.shop-list { list-style: none; }
+.shop-item { display: flex; align-items: center; gap: 10px; padding: 9px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
+.shop-item:last-child { border: none; }
+.shop-item input[type="checkbox"] { width: 16px; height: 16px; accent-color: var(--blue); cursor: pointer; flex-shrink: 0; }
+.shop-item.done .shop-name { text-decoration: line-through; color: var(--text-hint); }
+.shop-cat-tag { font-size: 10px; padding: 2px 7px; border-radius: 10px; background: var(--bg-surface); color: var(--text-muted); border: 1px solid var(--border); flex-shrink: 0; }
+.shop-del { margin-left: auto; background: none; border: none; cursor: pointer; color: var(--text-hint); font-size: 15px; display: flex; border-radius: 4px; padding: 3px; }
+.shop-del:hover { color: var(--red-text); background: var(--red-bg); }
+.shop-summary { font-size: 12px; color: var(--text-muted); margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--border); display: flex; justify-content: space-between; }
+
+/* ── AI SECTION ───────────────────────────────────── */
+.ai-row { margin-top: 10px; }
+.ai-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+@media (max-width: 700px) { .ai-grid { grid-template-columns: repeat(2, 1fr); } }
+.ai-btn { background: var(--bg-surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 13px 14px; text-align: left; cursor: pointer; color: var(--text); font-family: inherit; display: flex; flex-direction: column; gap: 3px; transition: all 0.15s; }
+.ai-btn:hover { border-color: var(--blue); background: var(--blue-bg); }
+.ai-btn:hover .ai-label, .ai-btn:hover .ai-icon { color: var(--blue-text); }
+.ai-btn:hover .ai-desc { color: var(--blue-text); opacity: .75; }
+.ai-icon { font-size: 18px; margin-bottom: 2px; color: var(--text-muted); }
+.ai-label { font-size: 12px; font-weight: 600; }
+.ai-desc  { font-size: 11px; color: var(--text-muted); line-height: 1.3; }
+
+/* ── FORMS ────────────────────────────────────────── */
+input[type="text"], input[type="date"], input[type="time"], textarea, select {
+  background: var(--bg-surface); border: 1px solid var(--border); border-radius: var(--radius);
+  color: var(--text); font-family: inherit; font-size: 13px; padding: 7px 10px; outline: none; width: 100%;
+}
+input:focus, textarea:focus, select:focus { border-color: var(--blue); }
+select option { background: var(--bg-card); }
+
+/* ── MODAL ────────────────────────────────────────── */
+.overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.45); z-index: 100; align-items: center; justify-content: center; padding: 16px; }
+.overlay.open { display: flex; }
+.modal { background: var(--bg-card); border-radius: var(--radius-lg); width: 100%; max-width: 480px; max-height: 92vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,.25); }
+.modal-head { padding: 15px 18px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+.modal-head h2 { font-size: 15px; font-weight: 600; }
+.modal-body { padding: 18px; display: flex; flex-direction: column; gap: 13px; }
+.fg { display: flex; flex-direction: column; gap: 5px; }
+.fl { font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: .04em; }
+.fr { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.modal-foot { padding: 12px 18px; border-top: 1px solid var(--border); display: flex; gap: 8px; justify-content: flex-end; }
+
+/* ── SYNC INDICATOR ───────────────────────────────── */
+.sync-dot {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: var(--green); display: inline-block;
+  animation: pulse 2s infinite;
+}
+.sync-dot.syncing { background: var(--amber); animation: spin 0.7s linear infinite; width: 10px; height: 10px; border-radius: 50%; border: 1.5px solid var(--amber); border-top-color: transparent; }
+@keyframes pulse { 0%,100% { opacity:1 } 50% { opacity:.5 } }
+
+/* ── TOAST ────────────────────────────────────────── */
+#toast { position: fixed; bottom: 20px; right: 20px; background: var(--text); color: var(--bg-card); padding: 10px 16px; border-radius: var(--radius); font-size: 13px; z-index: 300; opacity: 0; transform: translateY(8px); transition: all 0.2s; pointer-events: none; max-width: 280px; }
+#toast.show { opacity: 1; transform: translateY(0); }
+</style>
+</head>
+<body>
+
+<!-- ══ LOADING ══════════════════════════════════════ -->
+<div id="loading-screen">
+  <div class="spinner"></div>
+  <span>Carregando...</span>
+</div>
+
+<!-- ══ LOGIN ════════════════════════════════════════ -->
+<div id="login-screen" style="display:none">
+  <div class="login-card">
+    <div style="font-size:40px;margin-bottom:16px">📋</div>
+    <h1>Painel de Produtividade</h1>
+    <p>Arthur Tabosa Matos<br>Entre com sua conta Google para acessar suas tarefas em qualquer dispositivo.</p>
+    <button class="btn-google" onclick="signIn()">
+      <svg width="18" height="18" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615z"/><path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z"/><path fill="#FBBC05" d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332z"/><path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.958L3.964 6.29C4.672 4.163 6.656 3.58 9 3.58z"/></svg>
+      Entrar com Google
+    </button>
+    <p class="login-note">Seus dados ficam salvos na nuvem e sincronizam em todos os seus dispositivos.</p>
+  </div>
+</div>
+
+<!-- ══ APP ══════════════════════════════════════════ -->
+<div class="page" id="app" style="display:none">
+
+  <!-- HEADER -->
+  <header class="header">
+    <div class="header-left">
+      <h1 id="greeting"></h1>
+      <div class="date" id="hdate"></div>
+    </div>
+    <div class="header-right">
+      <div class="header-stats" id="hstats"></div>
+      <div class="user-info" id="user-info"></div>
+    </div>
+  </header>
+
+  <!-- TOP GRID -->
+  <div class="top-grid">
+
+    <!-- KANBAN -->
+    <div>
+      <div class="tabs-wrap">
+        <nav class="tabs-nav" id="tabs-nav"></nav>
+        <div id="boards"></div>
+        <div class="board-actions" id="board-actions">
+          <button class="btn btn-primary" onclick="openTaskModal()">
+            <i class="ti ti-plus" aria-hidden="true"></i> Nova tarefa
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- SIDEBAR -->
+    <div style="display:flex;flex-direction:column;gap:10px;">
+      <div class="section">
+        <div class="section-header">
+          <div class="section-title"><i class="ti ti-calendar-event" aria-hidden="true"></i> Agenda</div>
+          <button class="btn" onclick="openEventModal()" style="font-size:11px;padding:4px 9px;">
+            <i class="ti ti-plus" aria-hidden="true"></i> Evento
+          </button>
+        </div>
+        <div class="cal-events" id="cal-events"></div>
+      </div>
+      <div class="section">
+        <div class="section-header" style="margin-bottom:8px;">
+          <div class="section-title"><i class="ti ti-calendar-week" aria-hidden="true"></i> Esta semana</div>
+        </div>
+        <div id="week-view" style="display:flex;flex-direction:column;gap:4px;"></div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- AI ROW -->
+  <div class="section ai-row">
+    <div class="section-header">
+      <div class="section-title"><i class="ti ti-brain" aria-hidden="true"></i> Ações com IA</div>
+    </div>
+    <div class="ai-grid">
+      <button class="ai-btn" onclick="ai('priorizar')">
+        <i class="ti ti-brain ai-icon" aria-hidden="true"></i>
+        <span class="ai-label">🧠 Priorizar meu dia</span>
+        <span class="ai-desc">Ordem de execução por urgência e impacto</span>
+      </button>
+      <button class="ai-btn" onclick="ai('relatorio')">
+        <i class="ti ti-file-analytics ai-icon" aria-hidden="true"></i>
+        <span class="ai-label">📋 Relatório semanal</span>
+        <span class="ai-desc">Resumo por contexto — concluídas e pendentes</span>
+      </button>
+      <button class="ai-btn" onclick="ai('planejar')">
+        <i class="ti ti-calendar-week ai-icon" aria-hidden="true"></i>
+        <span class="ai-label">📅 Planejar semana</span>
+        <span class="ai-desc">Distribuição de tarefas pelos dias úteis</span>
+      </button>
+      <button class="ai-btn" onclick="ai('ajuda')">
+        <i class="ti ti-pencil ai-icon" aria-hidden="true"></i>
+        <span class="ai-label">✍️ Me ajude nesta tarefa</span>
+        <span class="ai-desc">Orientação para executar uma tarefa específica</span>
+      </button>
+    </div>
+  </div>
+
+</div><!-- /app -->
+
+<!-- TASK MODAL -->
+<div class="overlay" id="task-modal">
+  <div class="modal">
+    <div class="modal-head">
+      <h2 id="modal-title">Nova tarefa</h2>
+      <button class="btn-icon" onclick="closeModal('task-modal')"><i class="ti ti-x" aria-hidden="true"></i></button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="t-id">
+      <div class="fg"><label class="fl">Título *</label><input type="text" id="t-titulo" placeholder="Título da tarefa..."></div>
+      <div class="fg"><label class="fl">Descrição</label><textarea id="t-desc" rows="2" placeholder="Detalhes..."></textarea></div>
+      <div class="fr">
+        <div class="fg"><label class="fl">Contexto</label><select id="t-tab"></select></div>
+        <div class="fg"><label class="fl">Status</label>
+          <select id="t-status">
+            <option value="pendente">Pendente</option>
+            <option value="andamento">Em andamento</option>
+            <option value="concluida">Concluída</option>
+            <option value="bloqueada">Bloqueada</option>
+          </select>
+        </div>
+      </div>
+      <div class="fr">
+        <div class="fg"><label class="fl">Prioridade</label>
+          <select id="t-prio">
+            <option value="media">Média</option>
+            <option value="alta">Alta</option>
+            <option value="baixa">Baixa</option>
+          </select>
+        </div>
+        <div class="fg"><label class="fl">Subcategoria</label><input type="text" id="t-sub" placeholder="Ex: Alvarás, Cap.2..."></div>
+      </div>
+      <div class="fr">
+        <div class="fg"><label class="fl">Data prazo</label><input type="date" id="t-data"></div>
+        <div class="fg"><label class="fl">Hora</label><input type="time" id="t-hora"></div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn" onclick="closeModal('task-modal')">Cancelar</button>
+      <button class="btn btn-primary" onclick="saveTask()"><i class="ti ti-check" aria-hidden="true"></i> Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- EVENT MODAL -->
+<div class="overlay" id="event-modal">
+  <div class="modal">
+    <div class="modal-head">
+      <h2>Novo evento</h2>
+      <button class="btn-icon" onclick="closeModal('event-modal')"><i class="ti ti-x" aria-hidden="true"></i></button>
+    </div>
+    <div class="modal-body">
+      <div class="fg"><label class="fl">Título *</label><input type="text" id="e-titulo" placeholder="Título..."></div>
+      <div class="fg"><label class="fl">Descrição</label><textarea id="e-desc" rows="2" placeholder="Descrição..."></textarea></div>
+      <div class="fr">
+        <div class="fg"><label class="fl">Data *</label><input type="date" id="e-data"></div>
+        <div class="fg"><label class="fl">Hora início</label><input type="time" id="e-ini"></div>
+      </div>
+      <div class="fr">
+        <div class="fg"><label class="fl">Hora fim</label><input type="time" id="e-fim"></div>
+        <div></div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn" onclick="closeModal('event-modal')">Cancelar</button>
+      <button class="btn btn-primary" onclick="saveEvent()"><i class="ti ti-check" aria-hidden="true"></i> Salvar</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<!-- ══ FIREBASE SDK ══════════════════════════════════ -->
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+
+<script>
+// ══════════════════════════════════════════════════════════════════
+// PASSO 1: Cole aqui as credenciais do seu projeto Firebase
+// ══════════════════════════════════════════════════════════════════
+const firebaseConfig = {
+  apiKey:            "AIzaSyB86Ye9d_TqswVQuRiy5LscsTf7KcgX6A4",
+  authDomain:        "painel-arthur.firebaseapp.com",
+  databaseURL:       "https://painel-arthur-default-rtdb.firebaseio.com",
+  projectId:         "painel-arthur",
+  storageBucket:     "painel-arthur.firebasestorage.app",
+  messagingSenderId: "262543996538",
+  appId:             "1:262543996538:web:bce3f640e4231d1dfe6dc3"
+};
+// ══════════════════════════════════════════════════════════════════
+
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db   = firebase.database();
+
+// ── CONFIG ────────────────────────────────────────────────────────
+const TABS = [
+  { id:'trabalho',  e:'💼', n:'Trabalho',   s:'DGPP' },
+  { id:'mestrado',  e:'🎓', n:'Mestrado',   s:'PPGEP/UFG' },
+  { id:'pos_ufg',   e:'📘', n:'Pós UFG',    s:'Gestão Prisional' },
+  { id:'pos_unirv', e:'📙', n:'Pós UniRV',  s:'Liderança' },
+  { id:'pos_intel', e:'📗', n:'Pós UFG',    s:'Inteligência' },
+  { id:'pessoal',   e:'🏠', n:'Pessoal',    s:'' },
+  { id:'compras',   e:'🛒', n:'Compras',    s:'', special:'shopping' },
+];
+const COLS = [
+  { id:'pendente',  n:'Pendente',     ic:'ti-circle' },
+  { id:'andamento', n:'Em andamento', ic:'ti-refresh' },
+  { id:'concluida', n:'Concluída',    ic:'ti-circle-check' },
+  { id:'bloqueada', n:'Bloqueada',    ic:'ti-ban' },
+];
+
+// ── STATE ─────────────────────────────────────────────────────────
+let uid      = null;
+let tasks    = {};   // { taskId: { tabId, colId, titulo, ... } }
+let shopping = [];   // [{ id, nome, qty, cat, checked }]
+let events   = [];   // [{ id, titulo, data, ini, fim }]
+let curTab   = TABS[0].id;
+let editId   = null;
+let shopFilter = 'Todos';
+
+// ── AUTH ──────────────────────────────────────────────────────────
+auth.onAuthStateChanged(user => {
+  document.getElementById('loading-screen').style.display = 'none';
+  if (user) {
+    document.getElementById('login-screen').style.display  = 'none';
+    document.getElementById('app').style.display = 'block';
+    uid = user.uid;
+    initApp(user);
+  } else {
+    document.getElementById('login-screen').style.display  = 'flex';
+    document.getElementById('app').style.display = 'none';
+    uid = null;
+  }
+});
+
+function signIn() {
+  const p = new firebase.auth.GoogleAuthProvider();
+  auth.signInWithPopup(p).catch(e => toast('Erro ao entrar: ' + e.message));
+}
+
+function signOut() {
+  auth.signOut();
+}
+
+// ── INIT APP ──────────────────────────────────────────────────────
+function initApp(user) {
+  // populate tab select (excluding shopping)
+  const sel = document.getElementById('t-tab');
+  sel.innerHTML = TABS.filter(t=>!t.special).map(t =>
+    `<option value="${t.id}">${t.e} ${t.n}${t.s?' — '+t.s:''}</option>`
+  ).join('');
+
+  // show user info
+  const ui = document.getElementById('user-info');
+  const name = user.displayName ? user.displayName.split(' ')[0] : 'Arthur';
+  const avatarHTML = user.photoURL
+    ? `<img class="user-avatar" src="${user.photoURL}" alt="${name}">`
+    : `<div class="user-avatar-fallback">${name.charAt(0)}</div>`;
+  ui.innerHTML = `
+    ${avatarHTML}
+    <span>${name}</span>
+    <span class="sync-dot" id="sync-dot" title="Sincronizado"></span>
+    <button class="btn-icon" onclick="signOut()" title="Sair" style="font-size:13px;">
+      <i class="ti ti-logout" aria-hidden="true"></i>
+    </button>
+  `;
+
+  // listen to all user data in real time
+  db.ref(`users/${uid}`).on('value', snap => {
+    const data = snap.val() || {};
+
+    // tasks: flat object { taskId: taskObj }
+    tasks = data.tasks || {};
+
+    // shopping: object { itemId: itemObj }
+    const rawShop = data.shopping || {};
+    shopping = Object.entries(rawShop).map(([id, v]) => ({ id, ...v }))
+      .sort((a,b) => (a.ordem||0) - (b.ordem||0));
+
+    // events
+    const rawEv = data.events || {};
+    events = Object.entries(rawEv).map(([id, v]) => ({ id, ...v }))
+      .sort((a,b) => a.data.localeCompare(b.data));
+
+    buildHeader();
+    buildTabs();
+    buildBoards();
+    renderShopping();
+    renderCalendar();
+    renderWeek();
+  }, err => {
+    toast('Erro ao carregar dados: ' + err.message);
+  });
+
+  setInterval(buildHeader, 60000);
+}
+
+// ── HEADER ────────────────────────────────────────────────────────
+function buildHeader() {
+  const now = new Date();
+  const h = now.getHours();
+  const sal = h < 12 ? 'Bom dia' : h < 18 ? 'Boa tarde' : 'Boa noite';
+  document.getElementById('greeting').textContent = sal + ', Arthur 👋';
+  const d = now.toLocaleDateString('pt-BR', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
+  document.getElementById('hdate').textContent = d.charAt(0).toUpperCase() + d.slice(1);
+  renderStats();
+}
+
+function openCount(tabId) {
+  return Object.values(tasks).filter(t => t.tabId === tabId && t.colId !== 'concluida').length;
+}
+function shopPendingCount() { return shopping.filter(i=>!i.checked).length; }
+
+function renderStats() {
+  const w  = openCount('trabalho');
+  const m  = openCount('mestrado');
+  const p  = ['pos_ufg','pos_unirv','pos_intel'].reduce((s,id)=>s+openCount(id),0);
+  const pe = openCount('pessoal');
+  const sp = shopPendingCount();
+  document.getElementById('hstats').innerHTML = [
+    ['ti-briefcase','Trabalho',w],
+    ['ti-school','Mestrado',m],
+    ['ti-book','Pós',p],
+    ['ti-home','Pessoal',pe],
+    ['ti-shopping-cart','Compras',sp],
+  ].map(([ic,lb,n]) =>
+    `<div class="stat-badge"><i class="ti ${ic}" aria-hidden="true"></i>${lb} <span class="n">${n}</span></div>`
+  ).join('');
+}
+
+// ── TABS ──────────────────────────────────────────────────────────
+function tabCount(t) {
+  if (t.special === 'shopping') return shopPendingCount();
+  return openCount(t.id);
+}
+
+function buildTabs() {
+  document.getElementById('tabs-nav').innerHTML = TABS.map(t => {
+    const n = tabCount(t);
+    return `<button class="tab-btn ${t.id===curTab?'active':''}" onclick="switchTab('${t.id}')">
+      ${t.e} ${t.n}${t.s?` <span class="tab-sub">/ ${t.s}</span>`:''}
+      <span class="tab-n">${n}</span>
+    </button>`;
+  }).join('');
+}
+
+function switchTab(id) {
+  curTab = id;
+  buildTabs();
+  document.querySelectorAll('.board').forEach(b => b.classList.remove('active'));
+  const bd = document.getElementById('bd-'+id);
+  if (bd) bd.classList.add('active');
+  const ba = document.getElementById('board-actions');
+  if (ba) ba.style.display = id === 'compras' ? 'none' : 'flex';
+}
+
+// ── BOARDS ────────────────────────────────────────────────────────
+function buildBoards() {
+  document.getElementById('boards').innerHTML = TABS.map(t => {
+    if (t.special === 'shopping') return buildShoppingBoard(t);
+    return `<div class="board ${t.id===curTab?'active':''}" id="bd-${t.id}">
+      <div class="kanban">${COLS.map(c => buildCol(t.id, c)).join('')}</div>
+    </div>`;
+  }).join('');
+}
+
+function buildCol(tabId, col) {
+  const cs = getCards(tabId, col.id);
+  return `<div class="col">
+    <div class="col-head">
+      <span class="col-label ${col.id}"><i class="ti ${col.ic}" aria-hidden="true"></i>${col.n}</span>
+      <span class="col-n">${cs.length}</span>
+    </div>
+    <div class="col-body">
+      ${cs.map(t => buildCard(t, tabId, col.id)).join('')}
+      <button class="add-btn" onclick="openTaskModal('${tabId}','${col.id}')">
+        <i class="ti ti-plus" aria-hidden="true"></i> Adicionar
+      </button>
+    </div>
+  </div>`;
+}
+
+function getCards(tabId, colId) {
+  return Object.values(tasks).filter(t => t.tabId === tabId && t.colId === colId);
+}
+
+function buildCard(t, tabId, colId) {
+  const today = new Date().toISOString().slice(0,10);
+  let cls='', badgeHTML='';
+  if (t.data && t.data < today && colId !== 'concluida') {
+    cls = 'atrasada'; badgeHTML = `<span class="badge b-atrasada">Atrasada</span>`;
+  } else if (t.data === today && colId !== 'concluida') {
+    cls = 'hoje'; badgeHTML = `<span class="badge b-hoje">Hoje</span>`;
+  }
+  const prioBadge = t.prio ? `<span class="badge b-${t.prio}">${{alta:'Alta',media:'Média',baixa:'Baixa'}[t.prio]}</span>` : '';
+  let action = '';
+  if (colId === 'pendente' || colId === 'bloqueada')
+    action = `<button class="act iniciar"  onclick="moveTask('${t.id}','andamento')"><i class="ti ti-player-play" aria-hidden="true"></i> Iniciar</button>`;
+  else if (colId === 'andamento')
+    action = `<button class="act concluir" onclick="moveTask('${t.id}','concluida')"><i class="ti ti-check" aria-hidden="true"></i> Concluir</button>`;
+  else
+    action = `<button class="act reabrir"  onclick="moveTask('${t.id}','pendente')"><i class="ti ti-refresh" aria-hidden="true"></i> Reabrir</button>`;
+
+  const dateStr = t.data ? `<span class="task-date"><i class="ti ti-clock" aria-hidden="true"></i>${fmt(t.data,t.hora)}</span>` : '';
+  const subStr  = t.sub  ? `<span class="task-sub">${xe(t.sub)}</span>` : '';
+  const desc    = t.desc ? `<div class="task-body">${xe(t.desc).slice(0,90)}${t.desc.length>90?'…':''}</div>` : '';
+
+  return `<div class="task ${cls}" data-id="${t.id}">
+    <div class="task-title">${xe(t.titulo)}</div>
+    ${desc}
+    <div class="task-meta">${prioBadge}${badgeHTML}${dateStr}${subStr}</div>
+    <div class="task-acts">
+      ${action}
+      <button class="act" onclick="editTask('${t.id}')"><i class="ti ti-pencil" aria-hidden="true"></i></button>
+      <button class="act del" onclick="delTask('${t.id}')"><i class="ti ti-trash" aria-hidden="true"></i></button>
+    </div>
+  </div>`;
+}
+
+// ── TASK CRUD ─────────────────────────────────────────────────────
+function openTaskModal(tabId, colId) {
+  editId = null;
+  document.getElementById('modal-title').textContent = 'Nova tarefa';
+  ['t-id','t-titulo','t-desc','t-sub','t-data','t-hora'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('t-prio').value   = 'media';
+  document.getElementById('t-tab').value    = tabId || curTab;
+  document.getElementById('t-status').value = colId || 'pendente';
+  openModal('task-modal');
+}
+
+function editTask(taskId) {
+  const t = tasks[taskId];
+  if (!t) return;
+  editId = taskId;
+  document.getElementById('modal-title').textContent = 'Editar tarefa';
+  document.getElementById('t-id').value     = taskId;
+  document.getElementById('t-titulo').value = t.titulo;
+  document.getElementById('t-desc').value   = t.desc || '';
+  document.getElementById('t-sub').value    = t.sub  || '';
+  document.getElementById('t-data').value   = t.data || '';
+  document.getElementById('t-hora').value   = t.hora || '';
+  document.getElementById('t-prio').value   = t.prio || 'media';
+  document.getElementById('t-tab').value    = t.tabId;
+  document.getElementById('t-status').value = t.colId || 'pendente';
+  openModal('task-modal');
+}
+
+function saveTask() {
+  const titulo = document.getElementById('t-titulo').value.trim();
+  if (!titulo) { toast('Título é obrigatório'); return; }
+  const id = editId || 'tk_' + Date.now();
+  const t = {
+    id,
+    titulo,
+    desc:  document.getElementById('t-desc').value.trim(),
+    sub:   document.getElementById('t-sub').value.trim(),
+    data:  document.getElementById('t-data').value,
+    hora:  document.getElementById('t-hora').value,
+    prio:  document.getElementById('t-prio').value,
+    tabId: document.getElementById('t-tab').value,
+    colId: document.getElementById('t-status').value,
+    criadoEm: editId ? (tasks[editId]?.criadoEm || new Date().toISOString()) : new Date().toISOString(),
+  };
+  setSyncing(true);
+  db.ref(`users/${uid}/tasks/${id}`).set(t)
+    .then(() => { setSyncing(false); toast(editId ? 'Tarefa atualizada ✓' : 'Tarefa criada ✓'); })
+    .catch(e => { setSyncing(false); toast('Erro: ' + e.message); });
+  closeModal('task-modal');
+}
+
+function moveTask(taskId, newColId) {
+  setSyncing(true);
+  db.ref(`users/${uid}/tasks/${taskId}/colId`).set(newColId)
+    .then(() => setSyncing(false))
+    .catch(e => { setSyncing(false); toast('Erro: ' + e.message); });
+}
+
+function delTask(taskId) {
+  setSyncing(true);
+  db.ref(`users/${uid}/tasks/${taskId}`).remove()
+    .then(() => { setSyncing(false); toast('Tarefa removida'); })
+    .catch(e => { setSyncing(false); toast('Erro: ' + e.message); });
+}
+
+// ── CALENDAR ─────────────────────────────────────────────────────
+function renderCalendar() {
+  const today = new Date().toISOString().slice(0,10);
+  const upcoming = events.filter(e => e.data >= today).slice(0,5);
+  const el = document.getElementById('cal-events');
+  if (!el) return;
+  if (!upcoming.length) {
+    el.innerHTML = `<div class="empty-hint"><i class="ti ti-calendar-off" aria-hidden="true"></i> Nenhum evento esta semana.</div>`;
+    return;
+  }
+  el.innerHTML = upcoming.map(ev => {
+    const label = ev.data === today ? 'Hoje' : fmt(ev.data,'');
+    const time  = ev.ini ? ev.ini + (ev.fim ? '–'+ev.fim : '') : '';
+    return `<div class="event-card">
+      <div class="event-time">${label}${time?' · '+time:''}</div>
+      <div class="event-name">${xe(ev.titulo)}</div>
+    </div>`;
+  }).join('');
+}
+
+function renderWeek() {
+  const el = document.getElementById('week-view');
+  if (!el) return;
+  const now = new Date();
+  const dow = now.getDay();
+  const monday = new Date(now); monday.setDate(now.getDate() - (dow===0?6:dow-1));
+  const days = ['Seg','Ter','Qua','Qui','Sex'];
+  el.innerHTML = Array.from({length:5}).map((_,i) => {
+    const d = new Date(monday); d.setDate(monday.getDate()+i);
+    const iso = d.toISOString().slice(0,10);
+    const isToday = iso === now.toISOString().slice(0,10);
+    const dayEvs = events.filter(e=>e.data===iso);
+    return `<div style="display:flex;align-items:flex-start;gap:8px;padding:5px 6px;border-radius:6px;${isToday?'background:var(--blue-bg);':''}">
+      <span style="font-size:11px;font-weight:700;color:${isToday?'var(--blue-text)':'var(--text-muted)'};width:26px;flex-shrink:0;">${days[i]}<br><span style="font-weight:400">${d.getDate()}</span></span>
+      <div style="font-size:11px;color:var(--text-muted);line-height:1.5;flex:1;">
+        ${dayEvs.length ? dayEvs.map(e=>`<div style="color:var(--text);font-weight:500">${e.ini?e.ini+' ':''}${xe(e.titulo)}</div>`).join('') : '<span style="color:var(--text-hint)">—</span>'}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function openEventModal() {
+  ['e-titulo','e-desc','e-ini','e-fim'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('e-data').value = new Date().toISOString().slice(0,10);
+  openModal('event-modal');
+}
+
+function saveEvent() {
+  const titulo = document.getElementById('e-titulo').value.trim();
+  const data   = document.getElementById('e-data').value;
+  if (!titulo||!data) { toast('Título e data são obrigatórios'); return; }
+  const id = 'ev_' + Date.now();
+  const ev = { id, titulo, desc:document.getElementById('e-desc').value.trim(), data, ini:document.getElementById('e-ini').value, fim:document.getElementById('e-fim').value };
+  setSyncing(true);
+  db.ref(`users/${uid}/events/${id}`).set(ev)
+    .then(() => { setSyncing(false); toast('Evento adicionado ✓'); })
+    .catch(e => { setSyncing(false); toast('Erro: '+e.message); });
+  closeModal('event-modal');
+}
+
+// ── SHOPPING ─────────────────────────────────────────────────────
+function buildShoppingBoard(t) {
+  const cats = ['Todos','Supermercado','Farmácia','Papelaria','Outros'];
+  const pending = shopPendingCount(), total = shopping.length;
+  return `<div class="board ${t.id===curTab?'active':''}" id="bd-${t.id}">
+    <div class="shop-board">
+      <div class="shop-input">
+        <input type="text" id="si" placeholder="Adicionar item..." onkeydown="if(event.key==='Enter')addItem()">
+        <input type="text" id="sq" placeholder="Qtd" class="shop-qty" style="width:60px">
+        <select id="sc" style="width:auto;flex-shrink:0;">
+          <option value="Supermercado">🛒 Supermercado</option>
+          <option value="Farmácia">💊 Farmácia</option>
+          <option value="Papelaria">📋 Papelaria</option>
+          <option value="Outros">📦 Outros</option>
+        </select>
+        <button class="btn btn-primary" onclick="addItem()" style="flex-shrink:0;padding:7px 11px;">
+          <i class="ti ti-plus" aria-hidden="true"></i>
+        </button>
+      </div>
+      <div class="shop-cats">
+        ${cats.map(c => `<button class="cat-filter ${c===shopFilter?'active':''}" onclick="filterCat(this,'${c}')">${c}</button>`).join('')}
+        <button class="btn" onclick="clearDone()" style="margin-left:auto;font-size:11px;padding:4px 10px;">
+          <i class="ti ti-trash" aria-hidden="true"></i> Limpar marcados
+        </button>
+      </div>
+      <ul class="shop-list" id="shop-list"></ul>
+      <div class="shop-summary">
+        <span>${pending} pendente${pending!==1?'s':''} de ${total} item${total!==1?'ns':''}</span>
+        ${total>0?`<span>${Math.round((total-pending)/Math.max(total,1)*100)}% concluído</span>`:''}
+      </div>
+    </div>
+  </div>`;
+}
+
+function filterCat(btn, cat) {
+  shopFilter = cat;
+  document.querySelectorAll('.cat-filter').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderShopping();
+}
+
+function addItem() {
+  const v = document.getElementById('si').value.trim();
+  if (!v) return;
+  const id = 'sh_' + Date.now();
+  const item = { id, nome:v, qty:document.getElementById('sq').value.trim(), cat:document.getElementById('sc').value, checked:false, ordem:Date.now() };
+  document.getElementById('si').value = '';
+  document.getElementById('sq').value = '';
+  setSyncing(true);
+  db.ref(`users/${uid}/shopping/${id}`).set(item)
+    .then(() => setSyncing(false))
+    .catch(e => { setSyncing(false); toast('Erro: '+e.message); });
+}
+
+function toggleItem(id) {
+  const item = shopping.find(i=>i.id===id);
+  if (!item) return;
+  setSyncing(true);
+  db.ref(`users/${uid}/shopping/${id}/checked`).set(!item.checked)
+    .then(() => setSyncing(false))
+    .catch(e => { setSyncing(false); toast('Erro: '+e.message); });
+}
+
+function delItem(id) {
+  setSyncing(true);
+  db.ref(`users/${uid}/shopping/${id}`).remove()
+    .then(() => setSyncing(false))
+    .catch(e => { setSyncing(false); toast('Erro: '+e.message); });
+}
+
+function clearDone() {
+  const checked = shopping.filter(i=>i.checked);
+  if (!checked.length) return;
+  setSyncing(true);
+  const updates = {};
+  checked.forEach(i => { updates[`users/${uid}/shopping/${i.id}`] = null; });
+  db.ref().update(updates)
+    .then(() => { setSyncing(false); toast('Itens concluídos removidos'); })
+    .catch(e => { setSyncing(false); toast('Erro: '+e.message); });
+}
+
+function renderShopping() {
+  const el = document.getElementById('shop-list');
+  if (!el) return;
+  const filtered = shopFilter === 'Todos' ? shopping : shopping.filter(i => i.cat === shopFilter);
+  if (!filtered.length) {
+    el.innerHTML = `<li style="padding:14px 0;color:var(--text-hint);font-size:13px;text-align:center"><i class="ti ti-shopping-cart" style="opacity:.4;font-size:20px;display:block;margin-bottom:4px"></i>Lista vazia</li>`;
+    return;
+  }
+  el.innerHTML = filtered.map(i =>
+    `<li class="shop-item ${i.checked?'done':''}" data-id="${i.id}">
+      <input type="checkbox" ${i.checked?'checked':''} onchange="toggleItem('${i.id}')">
+      <span class="shop-name">${xe(i.nome)}${i.qty?` <span style="color:var(--text-hint)">× ${xe(i.qty)}</span>`:''}</span>
+      <span class="shop-cat-tag">${xe(i.cat)}</span>
+      <button class="shop-del" onclick="delItem('${i.id}')"><i class="ti ti-x" aria-hidden="true"></i></button>
+    </li>`
+  ).join('');
+}
+
+// ── AI ACTIONS ────────────────────────────────────────────────────
+function ai(type) {
+  const open = Object.values(tasks).filter(t=>t.colId!=='concluida');
+  const tabName = id => TABS.find(t=>t.id===id)?.n || id;
+  const lines = open.map(t => `- [${tabName(t.tabId)}] ${t.titulo} (${t.prio||'—'}${t.data?', prazo: '+fmt(t.data,''):''})`).join('\n');
+  const prompts = {
+    priorizar: `🧠 Priorize meu dia com base nas tarefas abertas abaixo. Sugira ordem de execução para hoje, considerando urgência, prazo e impacto:\n\n${lines}`,
+    relatorio: `📋 Gere um relatório semanal estruturado das minhas tarefas abertas:\n\n${lines}\n\nResuma por contexto e aponte o que precisa de atenção imediata.`,
+    planejar:  `📅 Distribua as tarefas abaixo pelos dias úteis desta semana considerando prioridade e prazo:\n\n${lines}`,
+    ajuda:     `✍️ Preciso de orientação para executar uma tarefa específica. Aqui estão minhas tarefas abertas para contexto:\n\n${lines}\n\nQual tarefa você quer que eu detalhe?`,
+  };
+  const prompt = prompts[type];
+  if (typeof sendPrompt === 'function') {
+    sendPrompt(prompt);
+  } else {
+    navigator.clipboard.writeText(prompt)
+      .then(() => toast('Prompt copiado! Cole no Claude.'))
+      .catch(() => alert('Abra este painel no chat do Claude para usar ações de IA diretamente.'));
+  }
+}
+
+// ── SYNC INDICATOR ────────────────────────────────────────────────
+function setSyncing(on) {
+  const dot = document.getElementById('sync-dot');
+  if (!dot) return;
+  dot.classList.toggle('syncing', on);
+}
+
+// ── MODALS ────────────────────────────────────────────────────────
+function openModal(id)  { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+document.addEventListener('click', e => {
+  if (e.target.classList.contains('overlay')) e.target.classList.remove('open');
+});
+
+// ── HELPERS ───────────────────────────────────────────────────────
+function fmt(d, h) {
+  if (!d) return '';
+  const [,m,day] = d.split('-');
+  return `${day}/${m}${h?' '+h:''}`;
+}
+function xe(s) {
+  return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+// ── TOAST ─────────────────────────────────────────────────────────
+let _tt;
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg; el.classList.add('show');
+  clearTimeout(_tt);
+  _tt = setTimeout(() => el.classList.remove('show'), 2800);
+}
+</script>
+</body>
+</html>
